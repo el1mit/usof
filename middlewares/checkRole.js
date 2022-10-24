@@ -7,7 +7,8 @@ module.exports.checkRole = (req, res, next) => {
             let token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
             if (!token) return next(ApiError.Unauthorized('Access Denied'));
             req.user = TokenUtils.verifyToken(token);
-            if (req.user.role !== 'ADMIN') return next(ApiError.Forbidden('You Dont Have Permissions'));
+
+            if (!req.user.admin) return next(ApiError.Forbidden('You Dont Have Permissions'));
             next();
         } catch (error) {
             next(error);

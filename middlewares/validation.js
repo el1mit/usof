@@ -108,7 +108,7 @@ class Validation {
     static categoryValidation(req, res, next) {
         const schema = Joi.object({
             title: Joi.string().min(1).required(),
-            description: Joi.string().min(10).required()
+            description: Joi.string().allow(null, '')
         });
         const { error } = schema.validate(req.body);
         if (error) next(ApiError.BadRequest(error.details[0].message));
@@ -118,7 +118,7 @@ class Validation {
     static categoryUpdateValidation(req, res, next) {
         const schema = Joi.object({
             title: Joi.string().min(1),
-            description: Joi.string().min(10)
+            description: Joi.string().allow(null, '')
         });
         const { error } = schema.validate(req.body);
         if (error) next(ApiError.BadRequest(error.details[0].message));

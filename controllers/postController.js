@@ -5,19 +5,7 @@ const Like = require('../models/Like');
 const ApiError = require('../utils/errorUtils');
 
 class postController {
-
-    static dynamicSort(property) {
-        var sortOrder = 1;
-        if (property[0] === "-") {
-            sortOrder = -1;
-            property = property.substr(1);
-        }
-        return function (a, b) {
-            var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-            return result * sortOrder;
-        }
-    }
-
+    
     static async getAllPosts(req, res, next) {
         try {
             const posts = await Post.getAllPosts();
@@ -71,7 +59,9 @@ class postController {
                 }
             });
 
-            posts.sort(postController.dynamicSort("-publish_date"));
+            posts.sort((a, b) => (a.publish_date < b.publish_date) ? 1
+                : ((b.publish_date < a.publish_date) ? -1 : 0));
+
             res.status(200).json(posts)
         } catch (error) {
             next(error)
