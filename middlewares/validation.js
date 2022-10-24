@@ -5,11 +5,11 @@ class Validation {
 
     static registerValidation(req, res, next) {
         const schema = Joi.object({
-            login: Joi.string().min(4).max(20).required(),
-            password: Joi.string().min(6).max(22).required(),
+            login: Joi.string().min(4).max(20).trim().required(),
+            password: Joi.string().min(6).max(22).trim().required(),
             password_confirmation: Joi.any().valid(Joi.ref('password')).required(),
             full_name: Joi.string().min(4).required(),
-            email: Joi.string().min(4).required().email(),
+            email: Joi.string().min(4).trim().required().email(),
             role: Joi.string()
         });
         const { error } = schema.validate(req.body);
@@ -19,9 +19,9 @@ class Validation {
 
     static loginValidation(req, res, next) {
         const schema = Joi.object({
-            login: Joi.string().min(4).max(20).required(),
-            email: Joi.string().min(4).required().email(),
-            password: Joi.string().min(6).max(22).required()
+            login: Joi.string().min(4).max(20).trim().required(),
+            email: Joi.string().min(4).trim().required().email(),
+            password: Joi.string().min(6).max(22).trim().required()
         });
         const { error } = schema.validate(req.body);
         if (error) next(ApiError.BadRequest(error.details[0].message));
@@ -30,12 +30,12 @@ class Validation {
 
     static updateValidation(req, res, next) {
         const schema = Joi.object({
-            login: Joi.string().min(4).max(20),
-            new_password: Joi.string().min(6).max(22),
-            password: Joi.string().min(6).max(22).required(),
+            login: Joi.string().min(4).max(20).trim(),
+            new_password: Joi.string().min(6).max(22).trim(),
+            password: Joi.string().min(6).max(22).trim().required(),
             password_confirmation: Joi.any().valid(Joi.ref('password')).required(),
-            full_name: Joi.string().min(4),
-            email: Joi.string().min(4).email(),
+            full_name: Joi.string().min(4).trim(),
+            email: Joi.string().min(4).trim().email(),
             avatar: Joi.string(),
             rating: Joi.string(),
             role: Joi.string()
@@ -47,7 +47,7 @@ class Validation {
 
     static passResetValidation(req, res, next) {
         const schema = Joi.object({
-            email: Joi.string().min(4).required().email(),
+            email: Joi.string().min(4).trim().required().email(),
         });
         const { error } = schema.validate(req.body);
         if (error) next(ApiError.BadRequest(error.details[0].message));
@@ -56,7 +56,7 @@ class Validation {
 
     static newPassValidation(req, res, next) {
         const schema = Joi.object({
-            new_password: Joi.string().min(6).max(22).required(),
+            new_password: Joi.string().min(6).max(22).trim().required(),
             new_password_confirm: Joi.any().valid(Joi.ref('new_password')).required(),
         });
         const { error } = schema.validate(req.body);
@@ -84,9 +84,9 @@ class Validation {
 
     static postValidation(req, res, next) {
         const schema = Joi.object({
-            title: Joi.string().min(5).required(),
+            title: Joi.string().min(4).required(),
             content: Joi.string().min(10).required(),
-            categories: Joi.array().items(Joi.number()).min(1).required()
+            categories: Joi.array().items(Joi.string()).min(1).required()
         });
         const { error } = schema.validate(req.body);
         if (error) next(ApiError.BadRequest(error.details[0].message));
@@ -95,9 +95,10 @@ class Validation {
 
     static postUpdateValidation(req, res, next) {
         const schema = Joi.object({
-            title: Joi.string().min(5),
+            title: Joi.string().min(4),
             content: Joi.string().min(10),
-            categories: Joi.array().items(Joi.number()).min(1)
+            status: Joi.number(),
+            categories: Joi.array().items(Joi.string()).min(1)
         });
         const { error } = schema.validate(req.body);
         if (error) next(ApiError.BadRequest(error.details[0].message));

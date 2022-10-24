@@ -4,14 +4,20 @@ const path = require('path');
 const User = require('../models/User');
 const ApiError = require('../utils/errorUtils');
 const TokenUtils = require('../utils/tokensUtils');
+const EmailUtils = require('../utils/emailUtils');
 const { hashPassword } = require('../utils/encryptUtils');
 
 class userController {
 
     static async getAllUsers(req, res, next) {
         try {
-            const users = await User.getAllUsers();
-            res.status(200).json({ users: users })
+            const usersData = await User.getAllUsers();
+            const users = [];
+            usersData.map((user)=> {
+                const {password, ...userData} = user
+                users.push(userData);
+            });
+            res.status(200).json(users);
         } catch (error) {
             next(error);
         }
@@ -19,8 +25,11 @@ class userController {
 
     static async getUserById(req, res, next) {
         try {
-            const user = await User.getUserData('id', req.params.id);
-            if (user) res.status(200).json({ user: user });
+            const userData = await User.getUserData('id', req.params.id);
+            if (userData) {
+                const {password, ...user} = userData
+                res.status(200).json(user);
+            }
             else return next(ApiError.NotFound('User Not Found'));
         } catch (error) {
             next(error);
@@ -38,11 +47,12 @@ class userController {
             const passwordHashed = await hashPassword(req.body.password);
             await User.createUser({ ...req.body, password: passwordHashed });
 
-            const user = await User.getUserData('login', req.body.login);
+            const userData = await User.getUserData('login', req.body.login);
+            const {password, ...user} = userData
             const token = TokenUtils.createTokenActivate(user);
             await EmailUtils.sendConfirmation(req.body.email, token);
             
-            res.status(201).json({ message: 'User Created. Email Confirmation Sent', user: req.body.login });
+            res.status(201).json({ message: 'User Created. Email Confirmation Sent', user });
         } catch (error) {
             next(error);
         }
@@ -52,12 +62,12 @@ class userController {
         try {
             const user = await User.getUserData('id', req.user.id);
             if (user.avatar !== 'avatar.png') {
-                const filePath = path.resolve(__dirname, '../images/avatars/', user.avatar); 
+                const filePath = path.resolve(__dirname, '../uploads/avatars', user.avatar); 
                 fs.unlinkSync(filePath);
             }
 
             User.uploadUserAvatar(req.user.id, req.file.filename);
-            res.status(200).json({message: 'Avatar uploaded'});
+            res.status(200).json({message: 'Avatar uploaded', avatar:`/avatar/${req.file.filename}`});
         } catch (error) {
             next(error);
         }
@@ -92,7 +102,7 @@ class userController {
                 user.role = req.body.role || user.role;
 
                 user = await User.updateUserData(req.params.id, user);
-                res.status(200).json({ message: 'User data updated', user: user });
+                res.status(200).json(user);
             } else {
                 return next(ApiError.NotFound('User Not Found'));
             }

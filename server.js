@@ -8,6 +8,8 @@ require('dotenv').config();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.use('/avatar', express.static('uploads/avatars'));
+app.use('/posts', express.static('uploads/posts'));
 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));

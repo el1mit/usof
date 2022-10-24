@@ -4,6 +4,7 @@ const Validation = require('../middlewares/validation');
 const { checkAuth } = require('../middlewares/checkAuth');
 
 router.get('/activation/:token', authController.accountConfirmation);
+router.get('/me', checkAuth, authController.getMe);
 router.post('/register', Validation.registerValidation, authController.register);
 router.post('/login', Validation.loginValidation, authController.login);
 router.post('/logout', checkAuth, authController.logout);

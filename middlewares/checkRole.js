@@ -4,7 +4,7 @@ const ApiError = require('../utils/errorUtils');
 module.exports.checkRole = (req, res, next) => {
     if (req.headers.authorization) {
         try {
-            let token = req.headers.authorization.split(' ')[1];
+            let token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
             if (!token) return next(ApiError.Unauthorized('Access Denied'));
             req.user = TokenUtils.verifyToken(token);
             if (req.user.role !== 'ADMIN') return next(ApiError.Forbidden('You Dont Have Permissions'));

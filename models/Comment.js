@@ -2,11 +2,24 @@ const db = require('../config/db');
 
 class Comment {
 
+    static async getAllPostsComments() {
+        try {
+            let sql = `SELECT post_id,
+                (SELECT COUNT(id)) AS count
+                FROM comments
+                GROUP BY post_id`;
+            const [data, _] = await db.execute(sql);
+            return data;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     static async getCommentById(id) {
         try {
             let sql = `SELECT * FROM comments WHERE id = ${id}`;
-            const [data, _] = await db.execute(sql);
-            return data[0];
+            const [comment, _] = await db.execute(sql);
+            return comment[0];
         } catch (error) {
             console.log(error);
         }
@@ -14,7 +27,8 @@ class Comment {
 
     static async getPostComments(postId) {
         try {
-            let sql = `SELECT comments.*, users.login AS author_login FROM comments 
+            let sql = `SELECT comments.*, users.login, users.avatar, users.rating
+            FROM comments 
             INNER JOIN users ON comments.author_id = users.id 
             WHERE post_id = ${postId}`;
             const [data, _] = await db.execute(sql);
@@ -28,8 +42,8 @@ class Comment {
         try {
             let sql = `INSERT INTO comments (author_id, publish_date, content, post_id) 
                 VALUES ('${data.authorId}', '${data.publishDate}', '${data.content}', '${data.postId}')`;
-            const [user, _] = await db.execute(sql);
-            return user[0];
+            const comment = await db.execute(sql);
+            return comment;
         } catch (error) {
             console.log(error);
         }

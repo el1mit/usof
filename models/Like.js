@@ -2,13 +2,29 @@ const db = require('../config/db');
 
 class Like {
 
-    static async getPostLikes(postId) {
+    static async getAllPostsLikes() {
         try {
-            let sql = `SELECT posts_likes.*,
+            let sql = `SELECT posts_likes.post_id,
                 (SELECT COUNT(IF(type = 1, 1, NULL))) AS likes_count,
                 (SELECT COUNT(IF(type = 0, 1, NULL))) AS dislikes_count
                 FROM posts_likes
-                WHERE post_id = ${postId}`;
+                GROUP BY post_id`;
+            const [data, _] = await db.execute(sql);
+            return data;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
+    static async getPostLikes(postId) {
+        try {
+            let sql = `SELECT posts_likes.post_id,
+                (SELECT COUNT(IF(type = 1, 1, NULL))) AS likes_count,
+                (SELECT COUNT(IF(type = 0, 1, NULL))) AS dislikes_count
+                FROM posts_likes
+                WHERE post_id = ${postId}
+                GROUP BY post_id`;
             const [data, _] = await db.execute(sql);
             return data[0];
         } catch (error) {
@@ -58,7 +74,7 @@ class Like {
 
     static async getCommentLikes(commentId) {
         try {
-            let sql = `SELECT comments_likes.*,
+            let sql = `SELECT comments_likes.comment_id, 
                 (SELECT COUNT(IF(type = 1, 1, NULL))) AS likes_count,
                 (SELECT COUNT(IF(type = 0, 1, NULL))) AS dislikes_count
                 FROM comments_likes

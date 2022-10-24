@@ -3,7 +3,7 @@ const uuid = require('uuid');
 
 const avatarStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './images/avatars');
+        cb(null, './uploads/avatars');
     },
     filename: (req, file, cb) => {
         cb(null, uuid.v4() + '.jpg');
@@ -12,7 +12,7 @@ const avatarStorage = multer.diskStorage({
 
 const postImagesStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './images/postsImages');
+        cb(null, './uploads/posts');
     },
     filename: (req, file, cb) => {
         cb(null, uuid.v4() + '.jpg');

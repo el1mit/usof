@@ -7,7 +7,7 @@ class commentsController {
     static async getCommentById(req, res, next) {
         try {
             const comment = await Comment.getCommentById(req.params.id);
-            if (comment) res.status(200).json({ comment: comment });
+            if (comment) res.status(200).json(comment);
             else return next(ApiError.NotFound('Comment Not Found'));
         } catch (error) {
             next(error)
@@ -19,8 +19,11 @@ class commentsController {
             const comment = await Comment.getCommentById(req.params.id);
             if (!comment) return next(ApiError.NotFound('You Try To Check Likes For Comment That Doesn Exist'));
 
-            const likes = await Like.getCommentLikes(req.params.id);
-            res.status(200).json({ likes_count: likes.likes_count - likes.dislikes_count });
+            let likes = await Like.getCommentLikes(req.params.id);
+            if (!likes.comment_id) likes = { ...likes, comment_id: req.params.id }
+            likes = { ...likes, count: likes.likes_count - likes.dislikes_count };
+
+            res.status(200).json(likes);
         } catch (error) {
             next(error);
         }
@@ -36,20 +39,24 @@ class commentsController {
 
             const like = await Like.getCommentLikeByUser(req.body);
             if (like && like.type === req.body.type) {
-                return next(ApiError.Conflict('You Already Done this'));
+                if (like.type === 1) return next(ApiError.Conflict('You Already Liked This Comment'));
+                else return next(ApiError.Conflict('You Already Disliked This Comment'));
             } else if (like) {
                 req.body.likeId = like.id;
                 await Like.updateCommentLike(req.body);
-                res.status(200).json({ message: 'Like Updated' });
+                if (req.body.type === 1) {
+                    res.status(200).json({ message: 'Comment Liked', count: 2 });
+                } else {
+                    res.status(200).json({ message: 'Comment Disliked', count: -2 });
+                }
             } else {
-                let date = new Date();
-                let yyyy = date.getFullYear();
-                let mm = date.getMonth() + 1;
-                let dd = date.getDate();
-                req.body.publishDate = `${yyyy}-${mm}-${dd}`;
-
+                req.body.publishDate = Date.now();
                 await Like.createCommentLike(req.body);
-                res.status(201).json({ message: 'Comment Liked' });
+                if (req.body.type === 1) {
+                    res.status(201).json({ message: 'Comment Liked', count: 1 });
+                } else {
+                    res.status(201).json({ message: 'Comment Disliked', count: -1 });
+                }
             }
         } catch (error) {
             next(error)
@@ -63,12 +70,12 @@ class commentsController {
 
             const comment = await Comment.getCommentById(req.body.commentId);
             if (!comment) return next(ApiError.NotFound('You Try To Change Comment That Doesn Exist'));
-            if (comment.author_id !== req.body.authorId) return next(ApiError.Forbidden('You Are Not The Author Of The Comment'));
+            if (!req.user.admin && (comment.author_id !== req.body.authorId)) return next(ApiError.Forbidden('You Are Not The Author Of The Comment'));
 
             req.body.content = req.body.content || comment.content;
             await Comment.updateComment(req.body);
 
-            res.status(200).json({ message: 'Post Updated' });
+            res.status(200).json({ message: 'Comment Updated' });
         } catch (error) {
             next(error)
         }
@@ -81,7 +88,7 @@ class commentsController {
 
             const comment = await Comment.getCommentById(req.body.commentId);
             if (!comment) return next(ApiError.NotFound('You Try To Delete Comment That Doesn Exist'));
-            if (comment.author_id !== req.body.authorId) return next(ApiError.Forbidden('You Are Not The Author Of The Comment'));
+            if (!req.user.admin && (comment.author_id !== req.body.authorId)) return next(ApiError.Forbidden('You Are Not The Author Of The Comment'));
 
             await Comment.deleteComment(req.body.commentId)
             res.status(200).json({ message: 'Comment Delted' });
@@ -101,7 +108,11 @@ class commentsController {
             if (!like) return next(ApiError.NotFound('You Try To Delete Like That Doesn Exist'));
 
             await Like.deleteCommentLike(req.body)
-            res.status(200).json({ message: 'Like Delted' });
+            if (like.type === 1) {
+                res.status(200).json({ message: 'Like Deleted', count: -1 });
+            } else {
+                res.status(200).json({ message: 'Dislike Deleted', count: 1 });
+            }
         } catch (error) {
             next(error)
         }

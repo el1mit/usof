@@ -4,12 +4,12 @@ const ApiError = require('../utils/errorUtils');
 module.exports.checkAuth = (req, res, next) => {
     if (req.headers.authorization) {
         try {
-            let token = req.headers.authorization.split(' ')[1];
+            let token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
             if (!token) return next(ApiError.Unauthorized('Access Denied'));
             req.user = TokenUtils.verifyToken(token);
             req.token = token;
 
-            if (!req.user.activated) return next(ApiError.Forbidden('Confirm Email First'));
+            if (!req.user.activated) return next(ApiError.Forbidden('Confirm Email First'));  
             if (req.originalUrl.match('/api/users/') &&
                 ((req.method === 'DELETE' && req.route.path === '/:id') ||
                 (req.method === 'PATCH' && req.route.path === '/:id'))) {

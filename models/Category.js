@@ -2,6 +2,21 @@ const db = require('../config/db');
 
 class Category {
 
+    static async getAllPostsCategories() {
+        try {
+            let sql = `SELECT post_categories.post_id,
+                GROUP_CONCAT(post_categories.category_id) AS categories_id,
+                GROUP_CONCAT(categories.title) AS categories_titles
+                FROM post_categories
+                INNER JOIN categories ON post_categories.category_id = categories.id 
+                GROUP BY post_categories.post_id`;
+            const [data, _] = await db.execute(sql);
+            return data;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     static async getAllCategories() {
         try {
             let sql = `SELECT * FROM categories`;
@@ -34,7 +49,8 @@ class Category {
 
     static async getCategoryPosts(categoryId) {
         try {
-            let sql = `SELECT post_categories.*, categories.title AS category_title, posts.title AS post_title FROM post_categories 
+            let sql = `SELECT post_categories.*, categories.title AS category_title, posts.title AS post_title 
+                FROM post_categories 
                 INNER JOIN posts ON post_categories.post_id = posts.id 
                 INNER JOIN categories ON post_categories.category_id = categories.id 
                 WHERE post_categories.category_id = ${categoryId}`;
@@ -48,8 +64,8 @@ class Category {
     static async createCategory(data) {
         try {
             let sql = `INSERT INTO categories (title, description) VALUES ('${data.title}', '${data.description}')`;
-            const [post, _] = await db.execute(sql);
-            return post;
+            const [category, _] = await db.execute(sql);
+            return category;
         } catch (error) {
             console.log(error);
         }

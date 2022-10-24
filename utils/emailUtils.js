@@ -8,7 +8,7 @@ class EmailUtils {
         message.html = `
         <div>
             <p>
-                Confirm your email by following this <a href="http://localhost:3000/api/auth/activation/${token}" target="_blank">link</a>
+                Confirm your email by following this <a href="http://localhost:3001/api/auth/activation/${token}" target="_blank">link</a>
             </p>
         </div>
         `;
@@ -21,7 +21,7 @@ class EmailUtils {
         message.html = `
         <div>
             <p>
-                Follow this <a href="http://localhost:3000/api/auth/password-reset/${token}" target="_blank">link</a> to reset your password
+                Follow this <a href="http://localhost:3001/api/auth/password-reset/${token}" target="_blank">link</a> to reset your password
             </p>
         </div>
         `;
