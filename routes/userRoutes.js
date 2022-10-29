@@ -7,9 +7,11 @@ const { avatarUpload } = require('../middlewares/fileUpload');
 
 router.get('/', checkAuth, userController.getAllUsers);
 router.get('/:id', checkAuth, userController.getUserById);
+router.get('/:id/posts', userController.getAllUserPosts);
 router.post('/', checkAuth, checkRole, Validation.registerValidation, userController.createNewUser);
 router.patch('/avatar', checkAuth, avatarUpload.single('avatar'), userController.uploadUserAvatar);
 router.patch('/:id', checkAuth, Validation.updateValidation, userController.updateUserData);
+router.delete('/avatar', checkAuth, userController.deleteUserAvatar);
 router.delete('/:id', checkAuth, userController.deleteUserById);
 
 module.exports = router;

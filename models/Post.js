@@ -15,6 +15,20 @@ class Post {
         }
     }
 
+    static async getAllUserPosts(author_id) {
+        try {
+            let sql = `SELECT posts.*, users.login, users.full_name, users.avatar
+                FROM posts 
+                INNER JOIN users ON posts.author_id = users.id
+                WHERE author_id = ${author_id}
+                GROUP BY posts.id`;
+            const [data, _] = await db.execute(sql);
+            return data;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     static async getPostById(id) {
         try {
             let sql = `SELECT posts.*, users.login, users.full_name, users.avatar
@@ -68,7 +82,18 @@ class Post {
     static async updatePost(data) {
         try {
             let sql = `UPDATE posts 
-                SET title = '${data.title}', content = '${data.content}', status = ${data.status} 
+                SET title = '${data.title}', content = '${data.content}', status = ${data.status}
+                WHERE id = ${data.postId}`;
+            return await db.execute(sql);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    static async updatePostImages(data) {
+        try {
+            let sql = `UPDATE posts 
+                SET content_image = '${data.content_image}'
                 WHERE id = ${data.postId}`;
             return await db.execute(sql);
         } catch (error) {

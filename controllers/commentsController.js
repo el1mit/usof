@@ -1,5 +1,6 @@
 const Comment = require('../models/Comment');
 const Like = require('../models/Like');
+const User = require('../models/User');
 const ApiError = require('../utils/errorUtils');
 
 class commentsController {
@@ -19,10 +20,18 @@ class commentsController {
             const comment = await Comment.getCommentById(req.params.id);
             if (!comment) return next(ApiError.NotFound('You Try To Check Likes For Comment That Doesn Exist'));
 
-            let likes = await Like.getCommentLikes(req.params.id);
-            if (!likes.comment_id) likes = { ...likes, comment_id: req.params.id }
-            likes = { ...likes, count: likes.likes_count - likes.dislikes_count };
+            let likes = await Like.getCommentLikes(Number(req.params.id));
 
+            if (likes?.comment_id) {
+                likes.count = likes.likes_count - likes.dislikes_count;
+            } else {
+                likes = {
+                    comment_id: Number(req.params.id),
+                    likes_count: 0,
+                    dislikes_count: 0,
+                    count: 0
+                }
+            }
             res.status(200).json(likes);
         } catch (error) {
             next(error);
@@ -38,23 +47,31 @@ class commentsController {
             if (!comment) return next(ApiError.NotFound('You Try To Like Comment That Doesn Exist'));
 
             const like = await Like.getCommentLikeByUser(req.body);
-            if (like && like.type === req.body.type) {
+            let { rating } = await User.getUserData('id', comment.author_id);
+
+            if (like && (like.type === req.body.type)) {
                 if (like.type === 1) return next(ApiError.Conflict('You Already Liked This Comment'));
                 else return next(ApiError.Conflict('You Already Disliked This Comment'));
             } else if (like) {
                 req.body.likeId = like.id;
                 await Like.updateCommentLike(req.body);
+
                 if (req.body.type === 1) {
+                    User.updateUserRating(comment.author_id, rating + 2);
                     res.status(200).json({ message: 'Comment Liked', count: 2 });
                 } else {
+                    User.updateUserRating(comment.author_id, rating - 2);
                     res.status(200).json({ message: 'Comment Disliked', count: -2 });
                 }
             } else {
                 req.body.publishDate = Date.now();
                 await Like.createCommentLike(req.body);
+
                 if (req.body.type === 1) {
+                    User.updateUserRating(comment.author_id, rating + 1);
                     res.status(201).json({ message: 'Comment Liked', count: 1 });
                 } else {
+                    User.updateUserRating(comment.author_id, rating - 1);
                     res.status(201).json({ message: 'Comment Disliked', count: -1 });
                 }
             }
@@ -107,10 +124,14 @@ class commentsController {
             const like = await Like.getCommentLikeByUser(req.body);
             if (!like) return next(ApiError.NotFound('You Try To Delete Like That Doesn Exist'));
 
-            await Like.deleteCommentLike(req.body)
+            await Like.deleteCommentLike(req.body);
+            let { rating } = await User.getUserData('id', comment.author_id);
+
             if (like.type === 1) {
+                User.updateUserRating(comment.author_id, rating - 1);
                 res.status(200).json({ message: 'Like Deleted', count: -1 });
             } else {
+                User.updateUserRating(comment.author_id, rating + 1);
                 res.status(200).json({ message: 'Dislike Deleted', count: 1 });
             }
         } catch (error) {

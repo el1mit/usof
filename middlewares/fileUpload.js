@@ -20,7 +20,7 @@ const postImagesStorage = multer.diskStorage({
 });
 
 const options = {
-    limits: { fileSize: 1 * 1024 * 1024 }, // 1MB
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
     fileFilter: (req, file, cb) => {
         if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
             cb(null, true);

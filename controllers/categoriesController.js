@@ -12,7 +12,7 @@ class categoriesController {
                 categories[i].posts_count = posts.length;
             }
 
-            categories.sort((a, b) => (a.title.toLowerCase() > b.title.toLowerCase()) ? 1
+            categories?.sort((a, b) => (a.title.toLowerCase() > b.title.toLowerCase()) ? 1
                 : ((b.title.toLowerCase() > a.title.toLowerCase()) ? -1 : 0));
 
             res.status(200).json(categories)
@@ -24,11 +24,13 @@ class categoriesController {
     static async getCategoryById(req, res, next) {
         try {
             let category = await Category.getCategoryById(req.params.id);
+            
             if (category) {
                 let posts = await Category.getCategoryPosts(category.id);
                 category.posts_count = posts.length;
                 res.status(200).json(category);
             } 
+
             else return next(ApiError.NotFound('Category Not Found'));
         } catch (error) {
             next(error);
@@ -41,7 +43,8 @@ class categoriesController {
             if (!category) return next(ApiError.NotFound('You Try To Check Posts For Category That Doesnt Exist'));
 
             const posts = await Category.getCategoryPosts(req.params.id);
-
+            posts?.sort((a, b) => (a.publish_date < b.publish_date) ? 1
+            : ((b.publish_date < a.publish_date) ? -1 : 0));
             res.status(200).json(posts);
         } catch (error) {
             next(error);

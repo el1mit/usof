@@ -8,12 +8,13 @@ module.exports.checkAuth = (req, res, next) => {
             if (!token) return next(ApiError.Unauthorized('Access Denied'));
             req.user = TokenUtils.verifyToken(token);
             req.token = token;
-
-            if (!req.user.activated) return next(ApiError.Forbidden('Confirm Email First'));  
+            
+            if (!req.user.activated) return next(ApiError.Forbidden('Confirm Email First'));
             if (req.originalUrl.match('/api/users/') &&
                 ((req.method === 'DELETE' && req.route.path === '/:id') ||
                 (req.method === 'PATCH' && req.route.path === '/:id'))) {
-                if (req.params.id != req.user.id) {
+                    
+                if ((req.params.id != req.user.id) && !req.user.admin) {
                     return next(ApiError.Forbidden('You Dont Have Permissions'));
                 }
             }

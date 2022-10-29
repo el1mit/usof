@@ -11,6 +11,7 @@ router.post('/:id/comments', checkAuth, Validation.commentValidation, postContro
 router.get('/:id/categories', postController.getPostCategories);
 router.get('/:id/like', postController.getPostLikes);
 router.post('/', checkAuth, Validation.postValidation, postImagesUpload.array('images', 10), postController.createPost);
+router.patch('/:id/images', checkAuth, postImagesUpload.any('images'), postController.uploadPostImages);
 router.post('/:id/like', checkAuth, postController.createPostLike);
 router.patch('/:id', checkAuth, Validation.postUpdateValidation, postController.updatePost);
 router.delete('/:id', checkAuth, postController.deletePost);

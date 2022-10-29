@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS posts(
     publish_date BIGINT NOT NULL,
     status BOOLEAN NOT NULL DEFAULT false,
     content TEXT NOT NULL,
-    content_image VARCHAR(255) NULL,
+    content_image TEXT NULL,
     FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

@@ -1,11 +1,14 @@
+const fs = require('fs');
+const path = require('path');
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 const Category = require('../models/Category');
 const Like = require('../models/Like');
+const User = require('../models/User');
 const ApiError = require('../utils/errorUtils');
 
 class postController {
-    
+
     static async getAllPosts(req, res, next) {
         try {
             const posts = await Post.getAllPosts();
@@ -59,7 +62,7 @@ class postController {
                 }
             });
 
-            posts.sort((a, b) => (a.publish_date < b.publish_date) ? 1
+            posts?.sort((a, b) => (a.publish_date < b.publish_date) ? 1
                 : ((b.publish_date < a.publish_date) ? -1 : 0));
 
             res.status(200).json(posts)
@@ -70,7 +73,14 @@ class postController {
 
     static async getPostById(req, res, next) {
         try {
-            const post = await Post.getPostById(req.params.id);
+            let post = await Post.getPostById(req.params.id);
+
+            if (post.content_image) {
+                post.content_image = post.content_image?.split(',');
+            } else {
+                post.content_image = []
+            }
+
             if (post) res.status(200).json(post);
             else return next(ApiError.NotFound('Post Not Found'));
         } catch (error) {
@@ -156,6 +166,61 @@ class postController {
         }
     }
 
+    static async uploadPostImages(req, res, next) {
+        try {
+            req.body.postId = req.params.id;
+            let post = await Post.getPostById(req.body.postId);
+            req.body.content_image = [];
+
+            if (post && req.files) {
+                if (!req.user.admin && (post.author_id !== req.user.id)) return next(ApiError.Forbidden('You Dont Have Permissions'));
+    
+                if (!post.content_image) {
+                    req.files?.map((file) => {
+                        req.body.content_image.push(file.filename);
+                    });
+                } else if (!req.body.imageNames && req.files.length === 0) {
+                    post.content_image = post.content_image?.split(',');
+
+                    post.content_image.forEach((image) => {
+                        const filePath = path.resolve(__dirname, '../uploads/posts', image);
+                        fs.unlinkSync(filePath);
+                    });
+
+                    req.body.content_image = '';
+                    await Post.updatePostImages(req.body);
+
+                } else {
+                    post.content_image = post.content_image?.split(',');
+
+                    req.body.imageNames.forEach((imageName) => {
+                        const existedImage = post.content_image.indexOf(imageName);
+                        const newImage = req.files.map(file => file.originalname).indexOf(imageName);
+
+                        if (existedImage > -1) {
+                            req.body.content_image.push(imageName);
+                        } else if (newImage > -1) {
+                            req.body.content_image.push(req.files[newImage].filename);
+                        }
+                    });
+
+                    post?.content_image?.forEach((image) => {
+                        if (req.body.content_image.indexOf(image) === -1) {
+                            const filePath = path.resolve(__dirname, '../uploads/posts', image);
+                            fs.unlinkSync(filePath);
+                        }
+                    });
+                    req.body.content_image = req.body.content_image.join(',');
+                }
+                await Post.updatePostImages(req.body);
+            }
+
+            res.status(200).json({ message: "Images Uploaded" });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     static async createPost(req, res, next) {
         try {
             req.body.authorId = req.user.id;
@@ -192,23 +257,29 @@ class postController {
             if (!post) return next(ApiError.NotFound('You Try To Like Post That Doesn Exist'));
 
             const like = await Like.getPostLikeByUser(req.body);
-            if (like && like.type === req.body.type) {
+            let { rating } = await User.getUserData('id', post.author_id);
+
+            if (like && (like.type === req.body.type)) {
                 if (like.type === 1) return next(ApiError.Conflict('You Already Liked This Post'));
                 else return next(ApiError.Conflict('You Already Disliked This Post'));
             } else if (like) {
                 req.body.likeId = like.id;
                 await Like.updatePostLike(req.body);
                 if (req.body.type === 1) {
+                    User.updateUserRating(post.author_id, rating + 2);
                     res.status(200).json({ message: 'Post Liked', count: 2 });
                 } else {
+                    User.updateUserRating(post.author_id, rating - 2);
                     res.status(200).json({ message: 'Post Disliked', count: -2 });
                 }
             } else {
                 req.body.publishDate = Date.now();
                 await Like.createPostLike(req.body);
                 if (req.body.type === 1) {
+                    User.updateUserRating(post.author_id, rating + 1);
                     res.status(201).json({ message: 'Post Liked', count: 1 });
                 } else {
+                    User.updateUserRating(post.author_id, rating - 1);
                     res.status(201).json({ message: 'Post Disliked', count: -1 });
                 }
             }
@@ -229,6 +300,8 @@ class postController {
 
             req.body.title = req.body.title || post.title;
             req.body.content = req.body.content || post.content;
+            req.body.content_image = post.content_image;
+
             if (!req.body.status && !(req.body.status === 0)) {
                 req.body.status = post.status;
             }
@@ -253,7 +326,6 @@ class postController {
                         await Post.addPostCategory(category.insertId, req.body.postId)
                     }
                 });
-
             }
 
             res.status(200).json({ message: 'Post Updated' });
@@ -270,6 +342,15 @@ class postController {
             const post = await Post.getPostById(req.body.postId);
             if (!post) return next(ApiError.NotFound('You Try To Delete Post That Doesn Exist'));
             if (!req.user.admin && (post.author_id !== req.body.authorId)) return next(ApiError.Forbidden('You Dont Have Permissions'));
+
+            if (post.content_image) {
+                post.content_image = post.content_image?.split(',');
+
+                post.content_image.forEach((image) => {
+                    const filePath = path.resolve(__dirname, '../uploads/posts', image);
+                    fs.unlinkSync(filePath);
+                });
+            }
 
             await Post.deletePost(req.body.postId)
             res.status(200).json({ message: 'Post Delted' });
@@ -288,10 +369,14 @@ class postController {
             const like = await Like.getPostLikeByUser(req.body);
             if (!like) return next(ApiError.NotFound('You Try To Delete Like That Doesn Exist'));
 
-            await Like.deletePostLike(req.body)
+            await Like.deletePostLike(req.body);
+            let { rating } = await User.getUserData('id', post.author_id);
+
             if (like.type === 1) {
+                User.updateUserRating(post.author_id, rating - 1);
                 res.status(200).json({ message: 'Like Deleted', count: -1 });
             } else {
+                User.updateUserRating(post.author_id, rating + 1);
                 res.status(200).json({ message: 'Dislike Deleted', count: 1 });
             }
         } catch (error) {

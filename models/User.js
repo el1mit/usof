@@ -38,10 +38,21 @@ class User {
         try {
             let sql = `UPDATE users 
                 SET login = '${data.login}', password = '${data.password}', full_name= '${data.full_name}',
-                    email = '${data.email}', rating = '${data.rating}', role = '${data.role}' 
+                    email = '${data.email}', role = '${data.role}' 
                 WHERE id = ${id}`;
             await db.execute(sql);
             return await User.getUserData('id', id);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    static async updateUserRating(id, rating) {
+        try {
+            let sql = `UPDATE users 
+                SET rating = '${rating}' 
+                WHERE id = ${id}`;
+            return await db.execute(sql);
         } catch (error) {
             console.log(error);
         }

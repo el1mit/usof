@@ -30,15 +30,13 @@ class Validation {
 
     static updateValidation(req, res, next) {
         const schema = Joi.object({
-            login: Joi.string().min(4).max(20).trim(),
-            new_password: Joi.string().min(6).max(22).trim(),
-            password: Joi.string().min(6).max(22).trim().required(),
-            password_confirmation: Joi.any().valid(Joi.ref('password')).required(),
-            full_name: Joi.string().min(4).trim(),
-            email: Joi.string().min(4).trim().email(),
-            avatar: Joi.string(),
-            rating: Joi.string(),
-            role: Joi.string()
+            login: Joi.string().min(4).max(20).trim().allow(null, ''),
+            new_password: Joi.string().min(6).max(22).trim().allow(null, ''),
+            password: Joi.string().min(6).max(22).trim().required().allow(null, ''),
+            password_confirmation: Joi.any().valid(Joi.ref('password')).required().allow(null, ''),
+            full_name: Joi.string().min(4).trim().allow(null, ''),
+            email: Joi.string().min(4).trim().email().allow(null, ''),
+            role: Joi.string().allow(null, '')
         });
         const { error } = schema.validate(req.body);
         if (error) next(ApiError.BadRequest(error.details[0].message));
@@ -86,7 +84,7 @@ class Validation {
         const schema = Joi.object({
             title: Joi.string().min(4).required(),
             content: Joi.string().min(10).required(),
-            categories: Joi.array().items(Joi.string()).min(1).required()
+            categories: Joi.array().items(Joi.string()).min(1).required(),
         });
         const { error } = schema.validate(req.body);
         if (error) next(ApiError.BadRequest(error.details[0].message));

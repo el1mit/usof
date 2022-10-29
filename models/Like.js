@@ -16,7 +16,6 @@ class Like {
         }
     }
 
-
     static async getPostLikes(postId) {
         try {
             let sql = `SELECT posts_likes.post_id,
@@ -78,7 +77,8 @@ class Like {
                 (SELECT COUNT(IF(type = 1, 1, NULL))) AS likes_count,
                 (SELECT COUNT(IF(type = 0, 1, NULL))) AS dislikes_count
                 FROM comments_likes
-                WHERE comment_id = ${commentId}`;
+                WHERE comment_id = ${commentId}
+                GROUP BY comment_id`;
             const [data, _] = await db.execute(sql);
             return data[0];
         } catch (error) {
