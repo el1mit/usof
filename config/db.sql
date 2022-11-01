@@ -1,17 +1,17 @@
 CREATE DATABASE IF NOT EXISTS usof;
 USE usof;
 
--- TO RESET DATABASE UNCOMMENT COMMENTED ROWS ON EXECUTE SCRIPT
+-- TO RESET DATABASE UNCOMMENT COMMENTED ROWS AND EXECUTE SCRIPT
 
-SET foreign_key_checks = 0;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS roles;
-DROP TABLE IF EXISTS posts;
-DROP TABLE IF EXISTS categories;
-DROP TABLE IF EXISTS post_categories;
-DROP TABLE IF EXISTS comments;
-DROP TABLE IF EXISTS posts_likes;
-DROP TABLE IF EXISTS comments_likes;
+-- SET foreign_key_checks = 0;
+-- DROP TABLE IF EXISTS users;
+-- DROP TABLE IF EXISTS roles;
+-- DROP TABLE IF EXISTS posts;
+-- DROP TABLE IF EXISTS categories;
+-- DROP TABLE IF EXISTS post_categories;
+-- DROP TABLE IF EXISTS comments;
+-- DROP TABLE IF EXISTS posts_likes;
+-- DROP TABLE IF EXISTS comments_likes;
 
 CREATE TABLE IF NOT EXISTS users(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -80,4 +80,4 @@ CREATE TABLE IF NOT EXISTS comments_likes(
     FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-SET foreign_key_checks = 1;
+-- SET foreign_key_checks = 1;

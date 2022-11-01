@@ -138,6 +138,7 @@ class userController {
     static async updateUserData(req, res, next) {
         try {
             let user = await User.getUserData('id', req.params.id);
+
             if (user) {
                 const passwordCheck = await bcrypt.compare(req.body.password, user.password);
                 if (!passwordCheck) return next(ApiError.BadRequest('Password Is Wrong'));
@@ -163,7 +164,7 @@ class userController {
                     user.full_name = req.body.full_name;
                 }
 
-                if (req.body?.role === 'ADMIN' || req.body.role === 'USER') {
+                if ((req.body?.role === 'ADMIN' || req.body?.role === 'USER') && req.user.admin) {
                     user.role = req.body.role
                 }
 
@@ -184,6 +185,7 @@ class userController {
     static async deleteUserById(req, res, next) {
         try {
             const user = await User.getUserData('id', req.params.id);
+            
             if (user.avatar !== 'avatar.png') {
                 const filePath = path.resolve(__dirname, '../images/avatars/', user.avatar);
                 fs.unlinkSync(filePath);
@@ -201,6 +203,7 @@ class userController {
     static async deleteUserAvatar(req, res, next) {
         try {
             const user = await User.getUserData('id', req.user.id);
+            
             if (user.avatar !== 'avatar.png') {
                 const filePath = path.resolve(__dirname, '../uploads/avatars', user.avatar);
                 fs.unlinkSync(filePath);

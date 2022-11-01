@@ -5,8 +5,8 @@ const { checkRole } = require('../middlewares/checkRole');
 const { checkAuth } = require('../middlewares/checkAuth');
 const { avatarUpload } = require('../middlewares/fileUpload');
 
-router.get('/', checkAuth, userController.getAllUsers);
-router.get('/:id', checkAuth, userController.getUserById);
+router.get('/', userController.getAllUsers);
+router.get('/:id', userController.getUserById);
 router.get('/:id/posts', userController.getAllUserPosts);
 router.post('/', checkAuth, checkRole, Validation.registerValidation, userController.createNewUser);
 router.patch('/avatar', checkAuth, avatarUpload.single('avatar'), userController.uploadUserAvatar);

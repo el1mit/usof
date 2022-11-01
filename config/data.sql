@@ -2,11 +2,11 @@ USE usof;
 
 INSERT INTO users (login, password, full_name, email, rating, role, activated) VALUES 
     ('admin', '$2a$12$Pz8H01H4j9.3mny4DS/JfOL4yw7ak.pFfRmkqs6ukggrzQgCDu/oO', 'Felix Canader', 'pabac52378@civikli.com', 999, 'ADMIN', 1),
-    ('operym', '$2a$12$D5ToX6mrY522RKauhRLequ9ASHeZNHvDWfquJ6iYP.x6vdGwn97jG', 'Olexander Erymon', 'xilag46581@canyona.com', 96, 'USER', 1),
-    ('dnisov', '$2a$12$rIVqt8F6fGtK052FMiQk/O8fuhP/DmrUEm0iL6F8ZTZ0ZJAgYKSgi', 'Demin Sovap', 'yotic77130@civikli.com', 42, 'USER', 1),
+    ('operym', '$2a$12$D5ToX6mrY522RKauhRLequ9ASHeZNHvDWfquJ6iYP.x6vdGwn97jG', 'Olexander Erymon', 'xilag46581@canyona.com', 0, 'USER', 1),
+    ('dnisov', '$2a$12$rIVqt8F6fGtK052FMiQk/O8fuhP/DmrUEm0iL6F8ZTZ0ZJAgYKSgi', 'Demin Sovap', 'yotic77130@civikli.com', 0, 'USER', 1),
     ('realadmin', '$2a$12$I31auwuVVbZ5iZyN24veAOkES226p3IQCGQXj1ljcbK7RkFPAgjxK', 'Jim Leron', 'lowovoy237@botsoko.com', 999, 'ADMIN', 1),
-    ('karen', '$2a$12$P6cQGrByiEdSrgHXYG53XONLWv6XWFnUQ7s/AlS9G8aUkQWFkpi7e', 'Felix Canader', 'vevig21678@botsoko.com', 15, 'USER', 1),
-    ('pokege', '$2a$12$P6cQGrByiEdSrgHXYG53XONLWv6XWFnUQ7s/AlS9G8aUkQWFkpi7e', 'Felix Canader', 'yanoha9233@civikli.com', 999, 'USER', 1);
+    ('karen', '$2a$12$P6cQGrByiEdSrgHXYG53XONLWv6XWFnUQ7s/AlS9G8aUkQWFkpi7e', 'Felix Canader', 'vevig21678@botsoko.com', 0, 'USER', 1),
+    ('pokege', '$2a$12$P6cQGrByiEdSrgHXYG53XONLWv6XWFnUQ7s/AlS9G8aUkQWFkpi7e', 'Felix Canader', 'yanoha9233@civikli.com', 0, 'USER', 1);
 
 INSERT INTO categories (title, description) VALUES
     ('JS', 'For questions regarding programming in ECMAScript (JavaScript/JS) and its various dialects/implementations (excluding ActionScript).'),
@@ -43,33 +43,3 @@ INSERT INTO post_categories (post_id, category_id) VALUES
     (4, 3), (4, 2), (4, 1),
     (5, 1), (5, 2), (5, 3),
     (6, 5), (6, 4);
-
-INSERT INTO posts_likes (author_id, publish_date, post_id, type) VALUES
-    (1, 1665178266692, 1, 1),
-    (1, 1665178266692, 2, 0),
-    (1, 1665178266692, 3, 1),
-    (2, 1665178266692, 1, 0),
-    (2, 1665178266692, 5, 1),
-    (3, 1665178266692, 1, 1),
-    (4, 1665178266692, 4, 0),
-    (2, 1665178266692, 3, 1),
-    (3, 1665178266692, 2, 0),
-    (4, 1665178266692, 5, 0),
-    (5, 1665178266692, 1, 1),
-    (4, 1665178266692, 1, 1),
-    (6, 1665178266692, 1, 1);
-
-INSERT INTO comments_likes (author_id, publish_date, comment_id, type) VALUES    
-    (1, 1665178266692, 1, 1),
-    (1, 1665178266692, 2, 0),
-    (1, 1665178266692, 3, 1),
-    (2, 1665178266692, 1, 0),
-    (2, 1665178266692, 5, 1),
-    (3, 1665178266692, 1, 1),
-    (4, 1665178266692, 4, 0),
-    (2, 1665178266692, 3, 1),
-    (3, 1665178266692, 2, 0),
-    (4, 1665178266692, 5, 0),
-    (5, 1665178266692, 1, 1),
-    (4, 1665178266692, 1, 1),
-    (6, 1665178266692, 1, 1);

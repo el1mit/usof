@@ -106,7 +106,7 @@ class authController {
         try {
             const userData = await User.getUserData('id', req.user.id);
             
-            if (userData.role === 'ADMIN') {
+            if (userData?.role === 'ADMIN') {
                 userData.admin = true;
             } else {
                 userData.admin = false;
