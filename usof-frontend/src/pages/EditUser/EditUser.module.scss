@@ -1,0 +1,14 @@
+form {
+    display: flex;
+    gap: 10px;
+    flex-flow: column nowrap;
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+
+    button {
+        margin-right: 15px;
+    }
+}

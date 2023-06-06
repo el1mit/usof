@@ -1,0 +1,13 @@
+export { Home } from './Home';
+export { AddPost } from './AddPost';
+export { AllPosts } from './AllPosts';
+export { FullPost } from './FullPost';
+export { AddCategory } from './AddCategory'
+export { AllCategories } from './AllCategories';
+export { FullCategory } from './FullCategory';
+export { AllUsers } from './AllUsers';
+export { UserProfile } from './UserProfile';
+export { EditUser } from './EditUser';
+export { Registration } from './Registration';
+export { RegistrationSuccessful } from './RegistrationSuccessful';
+export { Login } from './Login';

@@ -1,0 +1,94 @@
+$blue: #4361ee;
+
+.root {
+    overflow: hidden;
+    position: relative;
+    width: calc((100% - 3*10px) / 3);
+
+    &:hover {
+        box-shadow: 0 0 0 1px $blue;
+    }
+
+    &Full {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+}
+
+.wrapper {
+    padding: 20px;
+    display: flex;
+    flex-flow: column wrap;
+    height: 100%;
+}
+
+.title {
+    font-size: 28px;
+    margin: 0;
+
+    a {
+        text-decoration: none;
+        color: #000;
+
+        &:hover {
+            color: $blue;
+        }
+    }
+
+    &Full {
+        font-size: 38px;
+        font-weight: 600;
+    }
+}
+
+.description {
+    margin: 10px 0;
+    flex: 1 1 0;
+
+}
+
+.postDetails {
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.6);
+
+    svg {
+        font-size: 20px;
+        opacity: 0.7;
+    }
+}
+
+.editButtons {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 10px;
+    transition: all 0.15s ease-in-out;
+}
+
+//Skeleton
+.skeleton {
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 15px;
+
+    &Content {
+        padding: 20px;
+    }
+
+}
+
+.skeletonTitle {
+    display: flex;
+
+    &Details {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.skeletonAdditional {
+    display: flex;
+}
